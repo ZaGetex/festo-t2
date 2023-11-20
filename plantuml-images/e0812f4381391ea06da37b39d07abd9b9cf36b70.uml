@@ -1,0 +1,14 @@
+@startuml
+    !pragma layout smetana
+    skinparam classAttributeIconSize 0
+    left to right direction
+    object main
+    object FSM
+    object "Motor-Wrapper" as wrapper
+    object FestoTransferSystem
+
+    main --- FSM
+    FSM - wrapper
+    FSM --- FestoTransferSystem : system
+    wrapper --- FestoTransferSystem : system
+@enduml
