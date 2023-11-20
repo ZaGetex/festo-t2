@@ -45,7 +45,7 @@ int main() {
 
 
 void ampelschaltung(FestoTransferSystem *festo){
-
+    //new
     festo->updateSensors();
     festo->lampRed.switchOn();
     festo->lampYellow.switchOff();
