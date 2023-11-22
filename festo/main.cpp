@@ -12,7 +12,7 @@
 using namespace std;
 
 #define WAIT 1000
-#define LAP 2
+#define LAP 1
 
 void ampelschaltung(FestoTransferSystem *);
 void emergency(FestoTransferSystem *,bool *);
@@ -29,13 +29,13 @@ int main() {
     }
 
     //Main Code
-    while(fsm.getRunning()) {
+    while(fsm.running) {
         festo.updateSensors();
 
         fsm.evalStates();
         fsm.evalTransition();
 
-        emergency(&festo, reinterpret_cast<bool *>(fsm.getRunning())); //E-Break
+        emergency(&festo, &fsm.running); //E-Break
 
         festo.updateActuators();
     }
@@ -43,7 +43,7 @@ int main() {
 
 }
 
-void emergency(FestoTransferSystem *festo, bool * run){
+void emergency(FestoTransferSystem *festo, bool * running){
     if(festo->switchEmergency.isPressed()){
         festo->drive.setSpeed(CONVEYERBELT_STOP);
         festo->feedSeparator.close();
@@ -54,7 +54,8 @@ void emergency(FestoTransferSystem *festo, bool * run){
         festo->ledQ2.switchOff();
         festo->ledStart.switchOff();
         festo->ledReset.switchOff();
-        *run = false;
+        cout << "Emergency Triggered" << endl;
+        *running = false;
     }
 }
 

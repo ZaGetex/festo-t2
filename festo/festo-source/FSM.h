@@ -10,14 +10,16 @@
 class FSM {
 private:
     enum class States {ANFANGSZUSTAND = 0, BETRIEBSBEREIT};
-    bool running;
+
     States state;
 public:
     FSM();
     FestoTransferSystem festo;
-    bool getRunning() const;
+    //bool getRunning() const;
     bool evalTransition();
     void evalStates();
+    bool running;
+
 };
 
 

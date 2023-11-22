@@ -178,7 +178,7 @@ void FSM::evalStates() {
 
 }
 
-bool FSM::getRunning() const
-{
-    return this->running;
-}
+//bool FSM::getRunning() const
+//{
+   // return this->running;
+//}
