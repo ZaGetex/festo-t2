@@ -13,7 +13,8 @@ FSM::FSM() {
 
 bool FSM::evalTransition() {
 
-    States nextState;
+    States nextState = state; // Standardwert setzen
+
     switch (state) {
         case States::ANFANGSZUSTAND:
             if(festo.pushbuttonStart.isPressed()){
@@ -28,9 +29,14 @@ bool FSM::evalTransition() {
             }
             break;
         default:
-            return false;
+            return false; // Hier könntest du return false; hinzufügen, wenn das gewünscht ist.
     }
+
+    // Hier könntest du nextState zurückgeben oder weitere Logik implementieren.
+    return true; // Oder einen anderen sinnvollen Rückgabewert.
 }
+
+
 
 void FSM::evalStates() {
 

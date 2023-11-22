@@ -33,8 +33,8 @@ int main() {
         festo.updateSensors();
 
         fsm.evalStates();
-        fsm.evalTransition();
 
+        fsm.evalTransition();
         emergency(&festo, &fsm.running); //E-Break
 
         festo.updateActuators();
