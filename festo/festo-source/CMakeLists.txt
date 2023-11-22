@@ -15,6 +15,9 @@ set(SOURCE_FILES
         HeightSensor.cpp HeightSensor.h
         MetalDetector.cpp MetalDetector.h
         AlarmClock.cpp AlarmClock.h
-        )
+        FSM.h
+        FSM.h
+        FSM.cpp
+)
 
 add_library(festo-source STATIC ${SOURCE_FILES})
