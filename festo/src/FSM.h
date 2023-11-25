@@ -10,7 +10,26 @@
 
 class FSM {
 private:
-    enum class States {ANFANGSZUSTAND = 0, BETRIEBSBEREIT};
+    enum class States {
+        ANFANGSZUSTAND = 0,
+        BETRIEBSBEREIT,
+        NUll,
+        EINS,
+        ZWEI,
+        DREI,
+        VIER,
+        FUENF,
+        SECHS,
+        SIEBEN,
+        ACHT,
+        NEUN,
+        ZEHN,
+        ELF,
+        ZWOELF,
+        DREIZEHN,
+        VIERZEHN,
+        FUENFZEHN,
+        };
 
     States state;
     Motor motor;

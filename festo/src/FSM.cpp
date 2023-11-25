@@ -15,32 +15,123 @@ FSM::FSM() {
 
 bool FSM::evalTransition(FestoTransferSystem& festo) {
 
-    States nextState = state; // Standardwert setzen
+    States nextState = state;
 
     switch (state) {
         case States::ANFANGSZUSTAND:
-            if(festo.pushbuttonStart.isPressed()){
+            if(festo.pushbuttonStart.isPressEvent()){
                 nextState = States::BETRIEBSBEREIT;
                 cout << "Betriebsbereit" << endl;
-
             }
-            state = nextState;
             break;
+
         case States::BETRIEBSBEREIT:
-            if(festo.pushbuttonStart.isPressed()){
+            if(festo.pushbuttonStart.isPressEvent()){
                 nextState = States::ANFANGSZUSTAND;
                 cout << "Anfangszustand" << endl;
-
             }
-            state = nextState;
+            else if(festo.lightbarrierHeightSensor.isOpen()){
+                nextState = States::VIER;
+                cout << "4" << endl;
+            }
             break;
-        default:
-            return false; // Hier könntest du return false; hinzufügen, wenn das gewünscht ist.
-    }
 
-    // Hier könntest du nextState zurückgeben oder weitere Logik implementieren.
-    return true; // Oder einen anderen sinnvollen Rückgabewert.
+
+        case States::VIER:
+            if(festo.heightcheck.isHeightCorrect()){
+                nextState = States::FUENFZEHN;
+                cout << "5" << endl;
+            }
+            else if(!festo.heightcheck.isHeightCorrect()){
+                nextState = States::ACHT;
+                cout << "8" << endl;
+            }
+            break;
+
+        case States::FUENF:
+            if(festo.lightbarrierBegin.isOpen()){
+                nextState = States::SECHS;
+                cout << "6" << endl;
+            }
+            break;
+
+        case States::SECHS:
+            if(festo.pushbuttonReset.isPressed()){
+                nextState = States::SIEBEN;
+                cout << "7" << endl;
+            }
+            break;
+
+        case States::SIEBEN:
+            if(festo.lightbarrierFeedSeparator.isOpen()){
+                nextState = States::NEUN;
+                cout << "9" << endl;
+            }
+            break;
+
+        case States::ACHT:
+            if(festo.pushbuttonStart.isPressEvent()){
+                nextState = States::BETRIEBSBEREIT;
+                cout << "Betriebsbereit" << endl;
+            }
+            break;
+
+        case States::NEUN:
+            if(!festo.metalcheck.isMetalDetected()){
+                nextState = States::ZEHN;
+                cout << "10" << endl;
+            }
+            else if (festo.metalcheck.isMetalDetected()){
+                nextState = States::ELF;
+                cout << "11" << endl;
+            }
+            break;
+
+        case States::ZEHN:
+            if(festo.lightbarrierBufferFull.isOpen()) {
+                nextState = States::VIERZEHN;
+                cout << "14" << endl;
+            }
+            break;
+
+        case States::ELF:
+            if(festo.lightbarrierEnd.isOpen()){
+                nextState = States::ZWOELF;
+                cout << "12" << endl;
+            }
+            break;
+
+        case States::ZWOELF:
+            if(festo.lightbarrierEnd.isClosed()){ //TODO: RUTSCHE LICHTSENSOR??
+                nextState = States::DREIZEHN;
+                cout << "13" << endl;
+            }
+            break;
+
+        case States::DREIZEHN:
+                nextState = States::ANFANGSZUSTAND;
+                cout << "Anfangszustand" << endl;
+            break;
+
+        case States::VIERZEHN:
+            if(festo.lightbarrierBufferFull.isClosed()){
+                nextState = States::FUENFZEHN;
+                cout << "15" << endl;
+            }
+            break;
+
+        case States::FUENFZEHN:
+                nextState = States::ANFANGSZUSTAND;
+                cout << "Anfangszustand" << endl;
+            break;
+
+        default:
+            return false;
+    }
+    state = nextState;
+    return true;
 }
+
 
 
 
@@ -55,6 +146,7 @@ void FSM::evalStates(FestoTransferSystem& festo) {
             festo.lampYellow.switchOff();
             festo.lampGreen.switchOff();
             festo.ledStart.switchOn();
+            break;
 
         case States::BETRIEBSBEREIT:
             // 2.
@@ -67,123 +159,117 @@ void FSM::evalStates(FestoTransferSystem& festo) {
                 festo.lampYellow.switchOn();
                 Motor::motorSlowRight(festo);
             }
+            else {
+                festo.lampYellow.switchOff();
+            }
+            break;
 
+        case States::VIER:
             // 4.
-            bool heightOk;
-            if (festo.lightbarrierHeightSensor.isOpen()) {
                 festo.lampYellow.switchOff();
                 festo.lampRed.switchOn();
                 Motor::motorStop(festo);
-            }
+            break;
+
+        case States::FUENF:
             //5.
-            if (festo.heightcheck.isHeightCorrect()) {
-                heightOk = true;
-                if (festo.lightbarrierBegin.isClosed() && festo.heightcheck.isHeightCorrect()) {
                     festo.lampRed.switchOn();
-                    festo.lampYellow.switchOn();
+                     festo.lampYellow.switchOn();
                     festo.ledQ1.switchOn(); //TODO: Ausmachen wenn neues Werkstück
                     Motor::motorFastLeft(festo);
                     cout << "Höhe ist OK" << endl;
-                }
-                    //8:
-                else if (!festo.heightcheck.isHeightCorrect() &&
-                         festo.lightbarrierHeightSensor.isOpen()) { //Höhe nicht ok
+                break;
+
+        case States::ACHT:
+            //8.
                     Motor::motorFastRight(festo);
                     festo.lampYellow.switchOn();
                     festo.lampGreen.switchOn();
                     festo.ledQ1.switchOff();
                     cout << "Höhe ist nicht OK" << endl;
+                    break;
 
-                }
-            }
 
+        case States::SECHS:
             //6.
-            if (festo.lightbarrierBegin.isOpen() && heightOk) {
-                heightOk = false;
-
                 Motor::motorStop(festo);
                 festo.lampYellow.blink();
                 festo.lampRed.switchOn();
                 festo.ledReset.switchOn();
-            }
+            break;
 
+        case States::SIEBEN:
             //7.
-            if (festo.pushbuttonReset.isPressed()) {
+
                 Motor::motorFastRight(festo);
                 festo.lampYellow.switchOn();
                 festo.lampRed.switchOff();
                 festo.ledReset.switchOff();
                 //TODO: NUR BIS ZUR WEICHE TRANSPORTIEREN
-            }
+            break;
 
+        case States::NEUN:
             //9.
-            if (festo.lightbarrierFeedSeparator.isOpen()) {
                 Motor::motorStop(festo);
                 festo.lampRed.switchOn();
                 festo.lampYellow.switchOff();
                 festo.lampGreen.switchOff();
+                break;
+
+        case States::ZEHN:
                 //10.
-                if (!festo.metalcheck.isMetalDetected()) //nicht metallisch
-                {
                     Motor::motorFastRight(festo);
                     festo.lampRed.switchOff();
                     festo.lampYellow.switchOn();
                     festo.feedSeparator.open();
                     festo.ledQ2.switchOn();
+                break;
 
-                }
-                    //11.
-                else { //metallisch
+        case States::ELF:
+            //11.
                     Motor::motorFastRight(festo);
                     festo.ledQ2.switchOff();
                     festo.feedSeparator.close();
                     festo.lampYellow.switchOn();
-                }
-            }
+                break;
 
+
+        case States::ZWOELF:
             //12.
-            bool rutsche; //true = frei; false = besetzt
-
-            if (festo.lightbarrierEnd.isOpen()) { //rutsche besetzt
                 Motor::motorStop(festo);
                 festo.lampRed.switchOn();
                 festo.lampYellow.blink();
                 festo.lampGreen.switchOff();
-                rutsche = false;
-            }
+            break;
+
+        case States::DREIZEHN:
             //13.
-            if (festo.lightbarrierEnd.isClosed() && !rutsche) { //rutsche und Lichtschranke frei
                 Motor::motorStop(festo);
                 festo.feedSeparator.close();
                 festo.lampRed.switchOn();
                 festo.lampYellow.switchOff();
                 festo.lampGreen.switchOn();
-                rutsche = true;
+            break;
 
-            }
+        case States::VIERZEHN:
             //14.
-            bool auslauf; //true = frei ; false=besetzt
-
-            if (festo.lightbarrierBufferFull.isOpen()) { //auslauf besetzt
                 Motor::motorStop(festo);
                 festo.feedSeparator.close();
                 festo.ledQ2.switchOff();
                 festo.lampRed.switchOn();
                 festo.lampYellow.switchOff();
                 festo.lampGreen.switchOn();
-                auslauf = false;
-            }
+            break;
+
+        case States::FUENFZEHN:
             //15.
-            if (festo.lightbarrierBufferFull.isClosed() && !auslauf) { //auslauf frei
                 Motor::motorStop(festo);
                 festo.lampRed.switchOff();
                 festo.lampYellow.switchOn();
                 festo.lampGreen.switchOn();
-                auslauf = true;
-            }
-
-
             break;
+
+
         default:
             break;
     }
