@@ -133,8 +133,6 @@ bool FSM::evalTransition(FestoTransferSystem& festo) {
 }
 
 
-
-
 void FSM::evalStates(FestoTransferSystem& festo) {
 
     switch (state) {
