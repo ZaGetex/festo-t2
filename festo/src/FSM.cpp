@@ -33,11 +33,17 @@ bool FSM::evalTransition(FestoTransferSystem& festo) {
                 nextState = States::ANFANGSZUSTAND;
                 if (DEBUG_TRANSITIONS) cout << "Transition zu Anfangszustand" << endl;
             }
-            else if(festo.lightbarrierHeightSensor.isOpen()){
+            else if(festo.lightbarrierBegin.isOpen()){
+                nextState = States::DREI;
+                cout << "3" << endl;
+            }
+            break;
+
+        case States::DREI:
+            if (festo.lightbarrierHeightSensor.isOpen()) {
                 nextState = States::VIER;
                 if (DEBUG_TRANSITIONS) cout << "Transition zu 4" << endl;
             }
-            break;
 
 
         case States::VIER:
@@ -156,16 +162,14 @@ void FSM::evalStates(FestoTransferSystem& festo) {
             // 2.
             Motor::motorStop(festo);
             festo.lampGreen.switchOn();
+            break;
 
+        case States::DREI:
             // 3.
-            if (festo.lightbarrierBegin.isOpen()) {
                 festo.lampGreen.switchOff();
                 festo.lampYellow.switchOn();
                 Motor::motorSlowRight(festo);
-            }
-            else {
-                festo.lampYellow.switchOff();
-            }
+
             break;
 
         case States::VIER:
