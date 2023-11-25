@@ -25,6 +25,8 @@ int main() {
     FestoTransferSystem festo;
     FSM fsm;
 
+    cout << "-start-" << endl;
+
     //Boot
     for (int i = 0; i < LAP; ++i) {
         ampelschaltung(&festo);
@@ -93,4 +95,3 @@ void ampelschaltung(FestoTransferSystem *festo){
     sleepForMS(WAIT);
 
 }
-

@@ -8,4 +8,5 @@ set(SOURCE_FILES
         ## Dummy-Dateien können gelöscht werden, sobald neue Datien hier hinzugefügt wurden
 )
 
-add_library(src STATIC ${SOURCE_FILES})
+add_library(src STATIC ${SOURCE_FILES}
+        ../main.cpp)

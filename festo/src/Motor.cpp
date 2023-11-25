@@ -15,3 +15,7 @@ void Motor::motorFastLeft(FestoTransferSystem& festo) {festo.drive.setSpeed(CONV
 void Motor::motorSlowRight(FestoTransferSystem& festo) {festo.drive.setSpeed(CONVEYERBELT_RIGHT_SLOW);}
 
 void Motor::motorFastRight(FestoTransferSystem& festo) {festo.drive.setSpeed(CONVEYERBELT_RIGHT_FAST);}
+
+Motor::Motor() = default;
+
+Motor::~Motor() = default;

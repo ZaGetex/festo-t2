@@ -10,6 +10,9 @@ class Motor {
 private:
 
 public:
+    Motor();
+    virtual ~Motor();
+
     static void motorStop(FestoTransferSystem&);
     static void motorSlowLeft(FestoTransferSystem&);
     static void motorFastLeft(FestoTransferSystem&);
