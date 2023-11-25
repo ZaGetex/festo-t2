@@ -5,7 +5,7 @@
 #ifndef PRAKTIKUMPR2_FSM_H
 #define PRAKTIKUMPR2_FSM_H
 
-#include "FestoTransferSystem.h"
+#include "../festo-source/FestoTransferSystem.h"
 
 class FSM {
 private:

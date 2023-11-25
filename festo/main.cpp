@@ -8,6 +8,7 @@
 #include "TimeHelper.h"
 #include "FestoTransferSystem.h"
 #include "FSM.h"
+#include "Motor.h"
 
 using namespace std;
 
@@ -16,6 +17,7 @@ using namespace std;
 
 void ampelschaltung(FestoTransferSystem *);
 void emergency(FestoTransferSystem *,bool *);
+
 
 
 
@@ -45,7 +47,7 @@ int main() {
 
 void emergency(FestoTransferSystem *festo, bool * running){
     if(festo->switchEmergency.isPressed()){
-        festo->drive.setSpeed(CONVEYERBELT_STOP);
+        Motor::motorStop();
         festo->feedSeparator.close();
         festo->lampRed.switchOff();
         festo->lampYellow.switchOff();

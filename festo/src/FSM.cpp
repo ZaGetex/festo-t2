@@ -4,6 +4,8 @@
 
 #include "FSM.h"
 #include <iostream>
+#include "Motor.h"
+
 using namespace std;
 
 FSM::FSM() {
@@ -20,13 +22,17 @@ bool FSM::evalTransition() {
             if(festo.pushbuttonStart.isPressed()){
                 nextState = States::BETRIEBSBEREIT;
                 cout << "Betriebsbereit" << endl;
+
             }
+            state = nextState;
             break;
         case States::BETRIEBSBEREIT:
             if(festo.pushbuttonStart.isPressed()){
                 nextState = States::ANFANGSZUSTAND;
                 cout << "Anfangszustand" << endl;
+
             }
+            state = nextState;
             break;
         default:
             return false; // Hier könntest du return false; hinzufügen, wenn das gewünscht ist.
@@ -43,7 +49,7 @@ void FSM::evalStates() {
     switch (state) {
         case States::ANFANGSZUSTAND:
             // 1.
-            festo.drive.setSpeed(CONVEYERBELT_STOP); //TODO: Zu Motorwrapper ändern
+            Motor::motorStop();
             festo.feedSeparator.close();
             festo.lampRed.switchOff();
             festo.lampYellow.switchOff();
@@ -52,14 +58,14 @@ void FSM::evalStates() {
 
         case States::BETRIEBSBEREIT:
             // 2.
-            festo.drive.setSpeed(CONVEYERBELT_STOP); //TODO: Zu Motorwrapper ändern
+            Motor::motorStop();
             festo.lampGreen.switchOn();
 
             // 3.
             if (festo.lightbarrierBegin.isOpen()) {
                 festo.lampGreen.switchOff();
                 festo.lampYellow.switchOn();
-                festo.drive.setSpeed(CONVEYERBELT_RIGHT_SLOW); //TODO: Zu Motorwrapper ändern
+                Motor::motorSlowRight();
             }
 
             // 4.
@@ -67,7 +73,7 @@ void FSM::evalStates() {
             if (festo.lightbarrierHeightSensor.isOpen()) {
                 festo.lampYellow.switchOff();
                 festo.lampRed.switchOn();
-                festo.drive.setSpeed(CONVEYERBELT_STOP); //TODO: Zu Motorwrapper ändern
+                Motor::motorStop();
             }
             //5.
             if (festo.heightcheck.isHeightCorrect()) {
@@ -76,13 +82,13 @@ void FSM::evalStates() {
                     festo.lampRed.switchOn();
                     festo.lampYellow.switchOn();
                     festo.ledQ1.switchOn(); //TODO: Ausmachen wenn neues Werkstück
-                    festo.drive.setSpeed(CONVEYERBELT_LEFT_FAST); //TODO: Zu Motorwrapper ändern
+                    Motor::motorFastLeft();
                     cout << "Höhe ist OK" << endl;
                 }
                     //8:
                 else if (!festo.heightcheck.isHeightCorrect() &&
                          festo.lightbarrierHeightSensor.isOpen()) { //Höhe nicht ok
-                    festo.drive.setSpeed(CONVEYERBELT_RIGHT_FAST); //TODO: Motor Wrapper
+                    Motor::motorFastRight();
                     festo.lampYellow.switchOn();
                     festo.lampGreen.switchOn();
                     festo.ledQ1.switchOff();
@@ -95,7 +101,7 @@ void FSM::evalStates() {
             if (festo.lightbarrierBegin.isOpen() && heightOk) {
                 heightOk = false;
 
-                festo.drive.setSpeed(CONVEYERBELT_STOP); //TODO: Motor Wrapper
+                Motor::motorStop();
                 festo.lampYellow.blink();
                 festo.lampRed.switchOn();
                 festo.ledReset.switchOn();
@@ -103,7 +109,7 @@ void FSM::evalStates() {
 
             //7.
             if (festo.pushbuttonReset.isPressed()) {
-                festo.drive.setSpeed(CONVEYERBELT_RIGHT_FAST); //TODO: Motor Wrapper
+                Motor::motorFastRight();
                 festo.lampYellow.switchOn();
                 festo.lampRed.switchOff();
                 festo.ledReset.switchOff();
@@ -112,14 +118,14 @@ void FSM::evalStates() {
 
             //9.
             if (festo.lightbarrierFeedSeparator.isOpen()) {
-                festo.drive.setSpeed(CONVEYERBELT_STOP); //TODO: Motor Wrapper
+                Motor::motorStop();
                 festo.lampRed.switchOn();
                 festo.lampYellow.switchOff();
                 festo.lampGreen.switchOff();
                 //10.
                 if (!festo.metalcheck.isMetalDetected()) //nicht metallisch
                 {
-                    festo.drive.setSpeed(CONVEYERBELT_RIGHT_FAST); //TODO: Motor Wrapper
+                    Motor::motorFastRight();
                     festo.lampRed.switchOff();
                     festo.lampYellow.switchOn();
                     festo.feedSeparator.open();
@@ -128,7 +134,7 @@ void FSM::evalStates() {
                 }
                     //11.
                 else { //metallisch
-                    festo.drive.setSpeed(CONVEYERBELT_RIGHT_FAST); //TODO: Motor Wrapper
+                    Motor::motorFastRight();
                     festo.ledQ2.switchOff();
                     festo.feedSeparator.close();
                     festo.lampYellow.switchOn();
@@ -139,7 +145,7 @@ void FSM::evalStates() {
             bool rutsche; //true = frei; false = besetzt
 
             if (festo.lightbarrierEnd.isOpen()) { //rutsche besetzt
-                festo.drive.setSpeed(CONVEYERBELT_STOP); //TODO: Motor Wrapper
+                Motor::motorStop();
                 festo.lampRed.switchOn();
                 festo.lampYellow.blink();
                 festo.lampGreen.switchOff();
@@ -147,7 +153,7 @@ void FSM::evalStates() {
             }
             //13.
             if (festo.lightbarrierEnd.isClosed() && !rutsche) { //rutsche und Lichtschranke frei
-                festo.drive.setSpeed(CONVEYERBELT_STOP); //TODO: Motor Wrapper
+                Motor::motorStop();
                 festo.feedSeparator.close();
                 festo.lampRed.switchOn();
                 festo.lampYellow.switchOff();
@@ -159,7 +165,7 @@ void FSM::evalStates() {
             bool auslauf; //true = frei ; false=besetzt
 
             if (festo.lightbarrierBufferFull.isOpen()) { //auslauf besetzt
-                festo.drive.setSpeed(CONVEYERBELT_STOP); //TODO: Motor Wrapper
+                Motor::motorStop();
                 festo.feedSeparator.close();
                 festo.ledQ2.switchOff();
                 festo.lampRed.switchOn();
@@ -169,7 +175,7 @@ void FSM::evalStates() {
             }
             //15.
             if (festo.lightbarrierBufferFull.isClosed() && !auslauf) { //auslauf frei
-                festo.drive.setSpeed(CONVEYERBELT_STOP); //TODO: Motor Wrapper
+                Motor::motorStop();
                 festo.lampRed.switchOff();
                 festo.lampYellow.switchOn();
                 festo.lampGreen.switchOn();
