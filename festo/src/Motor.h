@@ -8,17 +8,13 @@
 
 class Motor {
 private:
-    static FestoTransferSystem *festo;
 
 public:
-    explicit Motor(FestoTransferSystem *festo); //konstruktor
-    virtual ~Motor(); //destruktor
-
-    static void motorStop();
-    static void motorSlowLeft();
-    static void motorFastLeft();
-    static void motorSlowRight();
-    static void motorFastRight();
+    static void motorStop(FestoTransferSystem&);
+    static void motorSlowLeft(FestoTransferSystem&);
+    static void motorFastLeft(FestoTransferSystem&);
+    static void motorSlowRight(FestoTransferSystem&);
+    static void motorFastRight(FestoTransferSystem&);
 };
 
 #endif //PRAKTIKUMPR2_MOTOR_H

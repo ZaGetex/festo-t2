@@ -34,9 +34,9 @@ int main() {
     while(fsm.running) {
         festo.updateSensors();
 
-        fsm.evalStates();
+        fsm.evalStates(festo);
 
-        fsm.evalTransition();
+        fsm.evalTransition(festo);
         emergency(&festo, &fsm.running); //E-Break
 
         festo.updateActuators();
@@ -47,7 +47,7 @@ int main() {
 
 void emergency(FestoTransferSystem *festo, bool * running){
     if(festo->switchEmergency.isPressed()){
-        Motor::motorStop();
+        Motor::motorStop(*festo);
         festo->feedSeparator.close();
         festo->lampRed.switchOff();
         festo->lampYellow.switchOff();
