@@ -11,15 +11,14 @@
 class FSM {
 private:
     enum class States {ANFANGSZUSTAND = 0, BETRIEBSBEREIT};
-
     States state;
-    Motor motor;
+    bool running;
 public:
     FSM();
     bool evalTransition(FestoTransferSystem&);
     void evalStates(FestoTransferSystem&);
-    bool running;
-
+    bool isRunning() const;
+    void emergency(FestoTransferSystem&);
 };
 
 

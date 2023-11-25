@@ -15,37 +15,33 @@ FSM::FSM() {
 
 bool FSM::evalTransition(FestoTransferSystem& festo) {
 
-    States nextState = state; // Standardwert setzen
+    States nextState = state;
 
     switch (state) {
         case States::ANFANGSZUSTAND:
-            if(festo.pushbuttonStart.isPressed()){
+            if(festo.pushbuttonStart.isPressEvent()){
                 nextState = States::BETRIEBSBEREIT;
                 cout << "Betriebsbereit" << endl;
-
             }
-            state = nextState;
             break;
+
         case States::BETRIEBSBEREIT:
-            if(festo.pushbuttonStart.isPressed()){
+            if(festo.pushbuttonStart.isPressEvent()){
                 nextState = States::ANFANGSZUSTAND;
                 cout << "Anfangszustand" << endl;
-
             }
-            state = nextState;
             break;
-        default:
-            return false; // Hier könntest du return false; hinzufügen, wenn das gewünscht ist.
-    }
 
-    // Hier könntest du nextState zurückgeben oder weitere Logik implementieren.
-    return true; // Oder einen anderen sinnvollen Rückgabewert.
+        default:
+            return false;
+    }
+    state = nextState;
+
+    return true;
 }
 
-
-
 void FSM::evalStates(FestoTransferSystem& festo) {
-
+    emergency(festo);
     switch (state) {
         case States::ANFANGSZUSTAND:
             // 1.
@@ -187,5 +183,21 @@ void FSM::evalStates(FestoTransferSystem& festo) {
         default:
             break;
     }
-
 }
+
+void FSM::emergency(FestoTransferSystem &festo) {
+    if(festo.switchEmergency.isPressed()){
+        Motor::motorStop(festo);
+        festo.feedSeparator.close();
+        festo.lampRed.switchOff();
+        festo.lampYellow.switchOff();
+        festo.lampGreen.switchOff();
+        festo.ledQ1.switchOff();
+        festo.ledQ2.switchOff();
+        festo.ledStart.switchOff();
+        festo.ledReset.switchOff();
+        cout << "Emergency Triggered" << endl;
+        running = false;
+    }
+}
+bool FSM::isRunning() const {return running;}
