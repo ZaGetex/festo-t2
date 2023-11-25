@@ -13,8 +13,6 @@ private:
     enum class States {
         ANFANGSZUSTAND = 0,
         BETRIEBSBEREIT,
-        NUll,
-        EINS,
         ZWEI,
         DREI,
         VIER,
@@ -32,13 +30,13 @@ private:
         };
 
     States state;
-    Motor motor;
+    bool running;
 public:
     FSM();
     bool evalTransition(FestoTransferSystem&);
     void evalStates(FestoTransferSystem&);
-    bool running;
-
+    bool isRunning() const;
+    void emergency(FestoTransferSystem &);
 };
 
 

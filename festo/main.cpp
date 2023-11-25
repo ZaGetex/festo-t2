@@ -12,8 +12,8 @@ int main() {
     FSM fsm;
     while(fsm.isRunning()) {
         festo.updateSensors();
-        fsm.evalStates(festo);
         fsm.evalTransition(festo);
+        fsm.evalStates(festo);
         festo.updateActuators();
     }
     return 0;
