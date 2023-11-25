@@ -269,7 +269,6 @@ void FSM::evalStates(FestoTransferSystem& festo) {
                 festo.lampGreen.switchOn();
             break;
 
-
         default:
             break;
     }
