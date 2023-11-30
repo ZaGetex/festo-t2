@@ -8,11 +8,11 @@
 
 class Motor {
 public:
-    static void motorStop(FestoTransferSystem&);
-    static void motorSlowLeft(FestoTransferSystem&);
-    static void motorFastLeft(FestoTransferSystem&);
-    static void motorSlowRight(FestoTransferSystem&);
-    static void motorFastRight(FestoTransferSystem&);
+    void motorStop(FestoTransferSystem&);
+    void motorSlowLeft(FestoTransferSystem&);
+    void motorFastLeft(FestoTransferSystem&);
+    void motorSlowRight(FestoTransferSystem&);
+    void motorFastRight(FestoTransferSystem&);
 };
 
 #endif //PRAKTIKUMPR2_MOTOR_H

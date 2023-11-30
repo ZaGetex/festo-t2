@@ -10,7 +10,7 @@
 int main() {
     FestoTransferSystem festo;
     FSM fsm;
-    while(fsm.isRunning()) {
+    while(fsm.getRunning()) {
         festo.updateSensors();
         fsm.evalTransition(festo);
         fsm.evalStates(festo);

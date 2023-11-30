@@ -11,31 +11,31 @@
 class FSM {
 private:
     enum class States {
-        ANFANGSZUSTAND = 0,
+        ANFANGSZUSTAND,
         BETRIEBSBEREIT,
-        ZWEI,
-        DREI,
-        VIER,
-        FUENF,
-        SECHS,
-        SIEBEN,
-        ACHT,
-        NEUN,
-        ZEHN,
-        ELF,
-        ZWOELF,
-        DREIZEHN,
-        VIERZEHN,
-        FUENFZEHN,
+        TRANSPORT,
+        HOEHENMESSUNG,
+        HOEHE_OK,
+        DREHEN,
+        TRANSPORT_GEDREHT,
+        HOEHE_NOT_OK,
+        WEICHE,
+        NOT_METALLIC,
+        METALLIC,
+        BUFFER,
+        BUFFER_FREE,
+        END,
+        END_FREE,
         };
 
     States state;
+    Motor motor;
     bool running;
 public:
     FSM();
     bool evalTransition(FestoTransferSystem&);
     void evalStates(FestoTransferSystem&);
-    bool isRunning() const;
+    bool getRunning() const;
     void emergency(FestoTransferSystem &);
 };
 
