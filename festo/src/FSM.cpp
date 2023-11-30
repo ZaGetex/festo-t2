@@ -6,17 +6,22 @@
 #include <iostream>
 #include "Motor.h"
 
+//#define DEBUG_PRINT_TRANS(x) {std::cout << x << std::endl; }
+#define DEBUG_PRINT_TRANS(x)
 using namespace std;
 
 bool DEBUG_TRANSITIONS = true;
 bool DEBUG_STATES  = true;
 
-FSM::FSM() {
+FSM::FSM(FestoTransferSystem& f)
+: motor(f)
+, festo(f)
+{
     this->running = true;
     this->state = States::ANFANGSZUSTAND;
 }
 
-bool FSM::evalTransition(FestoTransferSystem& festo) {
+bool FSM::evalTransition() {
 
     States nextState = state;
 
@@ -142,6 +147,7 @@ bool FSM::evalTransition(FestoTransferSystem& festo) {
             }
             else if (festo.pushbuttonStart.isPressEvent()) {
                 nextState = States::ANFANGSZUSTAND;
+                DEBUG_PRINT_TRANS("Transition zum Anfangszustand")
                 if (DEBUG_TRANSITIONS) cout << "Transition zum Anfangszustand" << endl;
             }
 
@@ -155,14 +161,14 @@ bool FSM::evalTransition(FestoTransferSystem& festo) {
     return true;
 }
 
-void FSM::evalStates(FestoTransferSystem& festo) {
-    emergency(festo);
+void FSM::evalStates() {
+    emergency();
     if(running) {
         switch (state) {
             case States::ANFANGSZUSTAND:
                 // 1.
                 if (DEBUG_STATES) cout << "State Anfangszustand" << endl;
-                motor.motorStop(festo);
+                motor.motorStop();
                 festo.feedSeparator.close();
                 festo.lampRed.switchOff();
                 festo.lampYellow.switchOff();
@@ -173,7 +179,7 @@ void FSM::evalStates(FestoTransferSystem& festo) {
             case States::BETRIEBSBEREIT:
                 if (DEBUG_STATES) cout << "State Betriebszustand" << endl;
                 // 2.
-                motor.motorStop(festo);
+                motor.motorStop();
                 festo.lampGreen.switchOn();
                 break;
 
@@ -182,17 +188,17 @@ void FSM::evalStates(FestoTransferSystem& festo) {
                 if (DEBUG_STATES) cout << "State 3" << endl;
                 festo.lampGreen.switchOff();
                 festo.lampYellow.switchOn();
-                motor.motorSlowRight(festo);
+                motor.motorSlowRight();
 
                 break;
 
             case States::HOEHENMESSUNG:
                 // 4.
                 if (DEBUG_STATES) cout << "State 4" << endl;
-                motor.motorStop(festo);
+                motor.motorStop();
                 festo.lampYellow.switchOff();
                 festo.lampRed.switchOn();
-                motor.motorStop(festo);
+                motor.motorStop();
                 break;
 
             case States::HOEHE_OK:
@@ -201,14 +207,14 @@ void FSM::evalStates(FestoTransferSystem& festo) {
                 festo.lampRed.switchOn();
                 festo.lampYellow.switchOn();
                 festo.ledQ1.switchOn();
-                motor.motorFastLeft(festo);
+                motor.motorFastLeft();
                 cout << "Höhe ist OK" << endl;
                 break;
 
             case States::HOEHE_NOT_OK:
                 //8.
                 if (DEBUG_STATES) cout << "State 8" << endl;
-                motor.motorFastRight(festo);
+                motor.motorFastRight();
                 festo.lampYellow.switchOn();
                 festo.lampGreen.switchOn();
                 festo.ledQ1.switchOff();
@@ -219,7 +225,7 @@ void FSM::evalStates(FestoTransferSystem& festo) {
             case States::DREHEN:
                 //6.
                 if (DEBUG_STATES) cout << "State 6" << endl;
-                motor.motorStop(festo);
+                motor.motorStop();
                 festo.lampYellow.blink();
                 festo.lampRed.switchOn();
                 festo.ledReset.switchOn();
@@ -229,7 +235,7 @@ void FSM::evalStates(FestoTransferSystem& festo) {
             case States::TRANSPORT_GEDREHT:
                 //7.
                 if (DEBUG_STATES) cout << "State 7" << endl;
-                motor.motorFastRight(festo);
+                motor.motorFastRight();
                 festo.lampYellow.switchOn();
                 festo.lampRed.switchOff();
                 festo.ledReset.switchOff();
@@ -239,7 +245,7 @@ void FSM::evalStates(FestoTransferSystem& festo) {
             case States::WEICHE:
                 //9.
                 if (DEBUG_STATES) cout << "State 9" << endl;
-                motor.motorStop(festo);
+                motor.motorStop();
                 festo.lampRed.switchOn();
                 festo.lampYellow.switchOff();
                 festo.lampGreen.switchOff();
@@ -249,7 +255,7 @@ void FSM::evalStates(FestoTransferSystem& festo) {
                 //10.
                 if (DEBUG_STATES) cout << "State 10" << endl;
                 cout << "Metal not detected!" << endl;
-                motor.motorFastRight(festo);
+                motor.motorFastRight();
                 festo.lampRed.switchOff();
                 festo.lampYellow.switchOn();
                 festo.feedSeparator.open();
@@ -260,7 +266,7 @@ void FSM::evalStates(FestoTransferSystem& festo) {
                 //11.
                 if (DEBUG_STATES) cout << "State 11" << endl;
                 cout << "Metal detected!" << endl;
-                motor.motorFastRight(festo);
+                motor.motorFastRight();
                 festo.ledQ2.switchOff();
                 festo.feedSeparator.close();
                 festo.lampYellow.switchOn();
@@ -270,7 +276,7 @@ void FSM::evalStates(FestoTransferSystem& festo) {
             case States::BUFFER:
                 //12.
                 if (DEBUG_STATES) cout << "State 12" << endl;
-                motor.motorStop(festo);
+                motor.motorStop();
                 festo.lampRed.switchOn();
                 festo.lampYellow.blink();
                 festo.lampGreen.switchOff();
@@ -279,7 +285,7 @@ void FSM::evalStates(FestoTransferSystem& festo) {
             case States::BUFFER_FREE:
                 //13.
                 if (DEBUG_STATES) cout << "State 13" << endl;
-                motor.motorStop(festo);
+                motor.motorStop();
                 festo.feedSeparator.close();
                 festo.lampRed.switchOn();
                 festo.lampYellow.switchOff();
@@ -289,7 +295,7 @@ void FSM::evalStates(FestoTransferSystem& festo) {
             case States::END:
                 //14.
                 if (DEBUG_STATES) cout << "State 14" << endl;
-                motor.motorStop(festo);
+                motor.motorStop();
                 festo.feedSeparator.close();
                 festo.ledQ2.switchOff();
                 festo.lampRed.switchOn();
@@ -300,7 +306,7 @@ void FSM::evalStates(FestoTransferSystem& festo) {
             case States::END_FREE:
                 //15.
                 if (DEBUG_STATES) cout << "State 15" << endl;
-                motor.motorStop(festo);
+                motor.motorStop();
                 festo.lampRed.switchOff();
                 festo.lampYellow.switchOn();
                 festo.lampGreen.switchOn();
@@ -313,9 +319,9 @@ void FSM::evalStates(FestoTransferSystem& festo) {
 }
 
 
-void FSM::emergency(FestoTransferSystem &festo) {
+void FSM::emergency() {
     if(festo.switchEmergency.isPressed()){
-        motor.motorStop(festo);
+        motor.motorStop();
         festo.feedSeparator.close();
         festo.lampRed.switchOff();
         festo.lampYellow.switchOff();

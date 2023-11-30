@@ -7,12 +7,17 @@
 #include "../festo-source/FestoTransferSystem.h"
 
 class Motor {
+private:
+    FestoTransferSystem& f;
+
+
 public:
-    void motorStop(FestoTransferSystem&);
-    void motorSlowLeft(FestoTransferSystem&);
-    void motorFastLeft(FestoTransferSystem&);
-    void motorSlowRight(FestoTransferSystem&);
-    void motorFastRight(FestoTransferSystem&);
+    Motor(FestoTransferSystem& fts);
+    void motorStop();
+    void motorSlowLeft();
+    void motorFastLeft();
+    void motorSlowRight();
+    void motorFastRight();
 };
 
 #endif //PRAKTIKUMPR2_MOTOR_H

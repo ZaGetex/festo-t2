@@ -9,11 +9,11 @@
 
 int main() {
     FestoTransferSystem festo;
-    FSM fsm;
+    FSM fsm(festo);
     while(fsm.getRunning()) {
         festo.updateSensors();
-        fsm.evalTransition(festo);
-        fsm.evalStates(festo);
+        fsm.evalTransition();
+        fsm.evalStates();
         festo.updateActuators();
     }
     return 0;

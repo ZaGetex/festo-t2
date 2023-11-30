@@ -30,13 +30,14 @@ private:
 
     States state;
     Motor motor;
+    FestoTransferSystem& festo;
     bool running;
 public:
-    FSM();
-    bool evalTransition(FestoTransferSystem&);
-    void evalStates(FestoTransferSystem&);
+    FSM(FestoTransferSystem& f);
+    bool evalTransition();
+    void evalStates();
     bool getRunning() const;
-    void emergency(FestoTransferSystem &);
+    void emergency();
 };
 
 
