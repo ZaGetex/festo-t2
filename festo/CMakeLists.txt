@@ -4,8 +4,8 @@ project(festo)
 set(CMAKE_CXX_STANDARD 14)
 
 ## Compiler Defines hier mittels add_definition hinzufügen
-add_definitions(-DHOME -DSIMULATION) #Schaltet die Simulation an
-add_definitions(-DSIM_SHOW_TIMESTAMP) #Gibt die in der Simulation vergangene Zeit aus
+#add_definitions(-DHOME -DSIMULATION) #Schaltet die Simulation an
+#add_definitions(-DSIM_SHOW_TIMESTAMP) #Gibt die in der Simulation vergangene Zeit aus
 
 ## Eines der beiden folgenden Defined kann aktiviert werden, um einen anderen Simulationsablauf zu waehlen
 #add_definitions(-DSIMLONGRUN) #Schaltet die Lange Simulation an
